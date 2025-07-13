@@ -5,7 +5,7 @@ import (
 	"quiz-generator-ai-agent-api/models"
 )
 
-func AgentHandler(user_request models.UserRequest) (any, error) {
+func AgentHandler(user_request models.UserRequest) (models.Message, error) {
 
 	question_model := ` Each question must be a JSON object with these exact fields:{
 		"QuestionId": [integer],
@@ -16,7 +16,8 @@ func AgentHandler(user_request models.UserRequest) (any, error) {
 		"OptionD": "[fourth option]",
 		"Answer": "[complete correct answer text matching one of the options exactly]"
 	}
-	for example,
+	**Your response should be a JSON array, with perfectly formatted in triple back ticks, of the questions.**
+	For example, 
 	[{
 		"QuestionId": 1,
 		"Ques": "What is a qubit?",
@@ -51,6 +52,8 @@ func AgentHandler(user_request models.UserRequest) (any, error) {
 		return models.Message{Role: "system", Content: "something went wrong (Decoding)"}, err
 	}
 
-	fmt.Println(response_message)
+	extracted_content := ExtractJSONBlock(response_message.Content)
+	response_message.Content = extracted_content
+	fmt.Println(response_message.Content)
 	return response_message, err
 }

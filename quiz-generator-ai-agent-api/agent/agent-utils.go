@@ -9,9 +9,19 @@ import (
 	"net/http"
 	"os"
 	"quiz-generator-ai-agent-api/models"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
+
+func ExtractJSONBlock(input string) string {
+	start := strings.Index(input, "[")
+	end := strings.LastIndex(input, "]")
+	if start == -1 || end == -1 || end <= start {
+		return ""
+	}
+	return input[start : end+1]
+}
 
 func LLMcall(messages []models.Message) (map[string]any, error) {
 

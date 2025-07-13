@@ -3,5 +3,6 @@ Content-Type: application/json
 
 {
     "Topic": "indus valley civilization",
-    "NoQ": "10"
+    "NoQ": "10",
+    "Difficulty": "easy"
 }

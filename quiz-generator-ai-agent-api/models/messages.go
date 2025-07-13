@@ -12,6 +12,7 @@ type Message struct {
 }
 
 type UserRequest struct {
-	Topic string `json:"topic"`
-	NoQ   string `json:"noq"`
+	Topic      string `json:"topic"`
+	NoQ        string `json:"noq"`
+	Difficulty string `json:"difficulty"`
 }

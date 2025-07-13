@@ -5,7 +5,10 @@ import (
 	"quiz-generator-ai-agent-api/models"
 )
 
-func AgentHandler(user_message models.Message) (any, error) {
+func AgentHandler(user_request models.UserRequest) (any, error) {
+	var user_message models.Message
+	user_message.Role = "user"
+	user_message.Content = "Generate " + user_request.NoQ + " questions about this topic: " + user_request.Topic
 	messages := []models.Message{user_message}
 
 	result, err := LLMcall(messages)

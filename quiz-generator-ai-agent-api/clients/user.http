@@ -2,6 +2,6 @@ POST http://localhost:8080/query
 Content-Type: application/json
 
 {
-    "Role": "user",
-    "Content": "generate 10 quiz questions in json format on topic, bollywood fun "
+    "Topic": "indus valley civilization",
+    "NoQ": "10"
 }

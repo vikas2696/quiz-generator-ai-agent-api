@@ -18,7 +18,7 @@ func LLMcall(messages []models.Message) (map[string]any, error) {
 	llm_endpoint_url := "https://api.groq.com/openai/v1/chat/completions"
 	var result map[string]any
 
-	llm_request_body := models.RequestBody{
+	llm_request_body := models.LLMRequestBody{
 		Model:    "llama3-8b-8192",
 		Messages: messages,
 		Stream:   false,

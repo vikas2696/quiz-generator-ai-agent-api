@@ -23,9 +23,9 @@ func main() {
 
 func handleAgentQuery(context *gin.Context) {
 
-	var message_from_user models.Message
-	context.ShouldBindJSON(&message_from_user)
-	result, err := agent.AgentHandler(message_from_user)
+	var user_request models.UserRequest
+	context.ShouldBindJSON(&user_request)
+	result, err := agent.AgentHandler(user_request)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -1,8 +1,8 @@
-POST http://localhost:8080/query
+POST https://thesurfacequiz-ai-agent.up.railway.app
 Content-Type: application/json
 
 {
-    "Topic": "indus valley civilization",
+    "Topic": "india",
     "NoQ": "10",
     "Difficulty": "easy"
 }

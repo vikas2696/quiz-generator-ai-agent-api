@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"quiz-generator-ai-agent-api/agent"
 	"quiz-generator-ai-agent-api/models"
 
@@ -14,7 +15,12 @@ func main() {
 
 	server.POST("/query", handleAgentQuery)
 
-	err := server.Run("localhost:8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // for local dev
+	}
+
+	err := server.Run(":" + port)
 	if err != nil {
 		fmt.Println("error running server: " + err.Error())
 	}

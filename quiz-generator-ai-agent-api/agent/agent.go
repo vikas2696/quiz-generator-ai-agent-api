@@ -1,11 +1,12 @@
 package agent
 
 import (
+	"encoding/json"
 	"fmt"
 	"quiz-generator-ai-agent-api/models"
 )
 
-func AgentHandler(user_request models.UserRequest) (models.Message, error) {
+func AgentHandler(user_request models.UserRequest) ([]models.Question, error) {
 
 	question_model := ` Each question must be a JSON object with these exact fields:{
 		"QuestionId": [integer],
@@ -44,16 +45,23 @@ func AgentHandler(user_request models.UserRequest) (models.Message, error) {
 
 	result, err := LLMcall(messages)
 	if err != nil {
-		return models.Message{Role: "system", Content: "something went wrong (LLM)"}, err
+		return []models.Question{}, err
 	}
 
 	response_message, err := convertLLMResult(result)
 	if err != nil {
-		return models.Message{Role: "system", Content: "something went wrong (Decoding)"}, err
+		return []models.Question{}, err
 	}
 
 	extracted_content := ExtractJSONBlock(response_message.Content)
-	response_message.Content = extracted_content
+
+	var questions []models.Question
+	err = json.Unmarshal([]byte(extracted_content), &questions)
+	if err != nil {
+		fmt.Println("Unmarshalling error")
+		return []models.Question{}, err
+	}
+
 	fmt.Println(response_message.Content)
-	return response_message, err
+	return questions, err
 }

@@ -30,6 +30,6 @@ func handleAgentQuery(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"questions": result.Content})
+	context.JSON(http.StatusOK, gin.H{"questions": result})
 
 }

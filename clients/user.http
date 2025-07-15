@@ -1,4 +1,4 @@
-POST https://thesurfacequiz-ai-agent.up.railway.app
+POST https://thesurfacequiz-ai-agent.up.railway.app/query
 Content-Type: application/json
 
 {

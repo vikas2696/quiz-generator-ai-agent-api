@@ -2,7 +2,7 @@ POST https://thesurfacequiz-ai-agent.up.railway.app/query
 Content-Type: application/json
 
 {
-    "Topic": "india",
+    "Topic": "friends tv show",
     "NoQ": "10",
     "Difficulty": "easy"
 }

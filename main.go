@@ -31,12 +31,12 @@ func handleAgentQuery(context *gin.Context) {
 
 	var user_request models.UserRequest
 	context.ShouldBindJSON(&user_request)
-	result, err := agent.AgentHandler(user_request)
+	questions, err := agent.AgentHandler(user_request)
 	if err != nil {
 		fmt.Print(err.Error())
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, just try again!"})
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, try again!"})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"questions": result})
+	context.JSON(http.StatusOK, gin.H{"questions": questions})
 
 }

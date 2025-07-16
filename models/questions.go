@@ -9,3 +9,7 @@ type Question struct {
 	OptionD    string `json:"OptionD"`
 	Answer     string `json:"Answer"`
 }
+type QuestionsJson struct {
+	Topic     string
+	Questions []Question
+}

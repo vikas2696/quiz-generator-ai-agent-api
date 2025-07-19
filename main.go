@@ -34,7 +34,7 @@ func handleAgentQuery(context *gin.Context) {
 	questions, err := agent.AgentHandler(user_request)
 	if err != nil {
 		fmt.Print(err.Error())
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, try again!"})
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong with the agent, try again!"})
 		return
 	}
 	context.JSON(http.StatusOK, gin.H{"questions": questions})

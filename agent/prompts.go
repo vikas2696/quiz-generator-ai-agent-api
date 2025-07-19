@@ -1,9 +1,72 @@
 package agent
 
-import "quiz-generator-ai-agent-api/models"
+import (
+	"fmt"
+	"quiz-generator-ai-agent-api/models"
+)
 
-func getPrompt(user_request models.UserRequest) string {
-	prompt := "Generate " + user_request.NoQ + " questions about this topic: " + user_request.Topic + " with " + user_request.Difficulty + " difficulty. " + ` Each question must be a JSON object with these exact fields:{
+func AnalyserPrompt(user_request models.UserRequest) string {
+	fmt.Println("**********ANALYSING**********")
+	// prompt := "Generate " + user_request.NoQ + " questions about this topic: " + user_request.Topic + " with " + user_request.Difficulty + " difficulty. " + ` Each question must be a JSON object with these exact fields:{
+	// 	"QuestionId": [integer],
+	// 	"Ques": "[clear, specific question]",
+	// 	"OptionA": "[first option]",
+	// 	"OptionB": "[second option]",
+	// 	"OptionC": "[third option]",
+	// 	"OptionD": "[fourth option]",
+	// 	"Answer": "[complete correct answer text matching one of the options exactly]"
+	// }
+	// **Your response should be a JSON array, with perfectly formatted in triple back ticks, of the questions.**
+	// For example,
+	// [{
+	// 	"QuestionId": 1,
+	// 	"Ques": "What is a qubit?",
+	// 	"OptionA": "A bit that can be either 0 or 1.",
+	// 	"OptionB": "A bit that can exist in multiple states simultaneously.",
+	// 	"OptionC": "A physical wire used to transmit quantum data.",
+	// 	"OptionD": "A type of classical computer.",
+	// 	"Answer": "A bit that can exist in multiple states simultaneously."
+	// },
+	// {
+	//     "QuestionId": 2,
+	//     "Ques": "Where is the Indus Valley Civilization located?",
+	//     "OptionA": "In ancient Egypt",
+	//     "OptionB": "In ancient Mesopotamia",
+	//     "OptionC": "In modern-day Pakistan and India",
+	//     "OptionD": "In South America",
+	//     "Answer": "In modern-day Pakistan and India"
+	// },.... ]`
+
+	prompt := fmt.Sprintf(`You are ANALYSER tool of a quiz generator agent. Your primary task is to analyse the user's query and generate
+	%s, valuable key points from your knowledge, so that the agent can provide those key points to the GENERATOR tool to generate the questions
+	for the quiz. The output should be clean with no followups.
+	User's query: %s,
+	Difficulty: %s`, user_request.NoQ, user_request.Topic, user_request.Difficulty)
+
+	return prompt
+
+}
+
+func GeneratorPrompt(request_type string, user_request models.UserRequest, key_points string,
+	validation_result models.Validation_result, questions []models.Question) string {
+	fmt.Println("**********TRYING TO GENERATE QUESTIONS**********")
+
+	prompt := fmt.Sprintf(`You are a GENERATOR tool of a quiz generator agent. Your primary task is to generate questions for the quiz.
+	You can have two types of requests,
+	1. "request_from_analyser"
+	2. "request_from_validator"
+
+	This is a request of type : %s,
+
+	You action if the request is,
+	1. "request_from_analyser": generate %s questions with %s difficulty using these points, %s.
+	OR
+	2. "request_from_validator": These are the questions you have just generated, %v, the VALIDATOR rejected these questions with the response:
+	%v, Recheck the questions and remove the error spotted by the validator and regenerate the questions in the specified format again.
+	Try avoiding the mistakes pointed out by the VALIDATOR. 
+
+	This is the required questions format:
+	Each question must be a JSON object with these exact fields:{
 		"QuestionId": [integer],
 		"Ques": "[clear, specific question]",
 		"OptionA": "[first option]",
@@ -12,7 +75,7 @@ func getPrompt(user_request models.UserRequest) string {
 		"OptionD": "[fourth option]",
 		"Answer": "[complete correct answer text matching one of the options exactly]"
 	}
-	**Your response should be a JSON array, with perfectly formatted in triple back ticks, of the questions.**
+	**Your response should be a JSON array of the questions, with perfectly formatted in triple back ticks.**
 	For example, 
 	[{
 		"QuestionId": 1,
@@ -31,8 +94,13 @@ func getPrompt(user_request models.UserRequest) string {
         "OptionC": "In modern-day Pakistan and India",
         "OptionD": "In South America",
         "Answer": "In modern-day Pakistan and India"
-	},.... ]`
-
+	},.... ]
+	
+	`, request_type, user_request.NoQ, user_request.Difficulty, key_points, questions, validation_result)
 	return prompt
 
+}
+
+func QualityValidatorPrompt(questions []models.Question) string {
+	return fmt.Sprintf(`Check these questions' accuracy, and return which questions are inaccurate, the questions are : %v`, questions)
 }

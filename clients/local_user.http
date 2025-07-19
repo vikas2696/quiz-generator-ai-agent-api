@@ -2,7 +2,7 @@ POST http://localhost:8080/query
 Content-Type: application/json
 
 {
-    "Topic": "indian geography",
+    "Topic": "anything interesting",
     "NoQ": "10",
     "Difficulty": "easy"
 }

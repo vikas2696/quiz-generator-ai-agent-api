@@ -52,10 +52,21 @@ func validate_quality(_ []models.Question) models.Validation_result {
 	var validation_result models.Validation_result
 	validation_result.IsValid = true
 	validation_result.Remark = "Quality validation passed."
+
+	//fake quality validaton for now
+	// user_message.Role = "system"
+	// user_message.Content = QualityValidatorPrompt(questions)
+	// res, _ := LLMcall([]models.Message{user_message})
+	// respo, _ := convertLLMResult(res)
+	// fmt.Println("************************************")
+	// fmt.Println(respo.Content)
+	// fmt.Println("************************************")
+
 	return validation_result
 }
 
 func Validator_tool(ques_string string) (models.Validation_result, []models.Question) {
+	fmt.Println("**********VALIDATING**********")
 	var validation_result models.Validation_result
 
 	validation_result, questions := validate_format(ques_string)

@@ -14,14 +14,14 @@ func AgentHandler(user_request models.UserRequest) ([]models.Question, error) {
 	user_message.Role = "user"
 	user_message.Content = AnalyserPrompt(user_request)
 
-	previous_messages, err := contextfiles.Read_context_file("contextfiles/analyzer_context.json")
+	analyser_context, err := contextfiles.Read_context_file("contextfiles/analyzer_context.json")
 	if err != nil {
 		return []models.Question{}, errors.New("context file reading error")
 	}
-	messages := append(previous_messages, user_message)
+	analyser_context = append(analyser_context, user_message)
 
 	//ANALYSER CALL
-	result, err := LLMcall(messages)
+	result, err := LLMcall(analyser_context)
 	if err != nil {
 		return []models.Question{}, err
 	}
@@ -48,7 +48,13 @@ func AgentHandler(user_request models.UserRequest) ([]models.Question, error) {
 		analyser_message.Role = "system"
 		analyser_message.Content = GeneratorPrompt(req_from, user_request, response_message.Content, validation_result, questions)
 
-		gen_result, err := LLMcall([]models.Message{analyser_message})
+		generator_context, err := contextfiles.Read_context_file("contextfiles/generator_context.json")
+		if err != nil {
+			return []models.Question{}, errors.New("context file reading error")
+		}
+		generator_context = append(generator_context, analyser_message)
+
+		gen_result, err := LLMcall(generator_context)
 		if err != nil {
 			return []models.Question{}, err
 		}

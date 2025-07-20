@@ -2,7 +2,7 @@ POST http://localhost:8080/query
 Content-Type: application/json
 
 {
-    "Topic": "anything interesting",
+    "Topic": "basic maths",
     "NoQ": "10",
-    "Difficulty": "easy"
+    "Difficulty": "hard"
 }

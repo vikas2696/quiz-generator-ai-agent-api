@@ -33,7 +33,7 @@ func handleAgentQuery(context *gin.Context) {
 	context.ShouldBindJSON(&user_request)
 	questions, err := agent.AgentHandler(user_request)
 	if err != nil {
-		fmt.Print(err.Error())
+		fmt.Println(err.Error())
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong with the agent, try again!"})
 		return
 	}

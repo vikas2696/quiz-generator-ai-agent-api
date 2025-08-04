@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"quiz-generator-ai-agent-api/contextfiles"
 	"quiz-generator-ai-agent-api/models"
-	"quiz-generator-ai-agent-api/tools"
 )
 
 func AgentHandler(user_request models.UserRequest) ([]models.Question, error) {
@@ -21,11 +20,11 @@ func AgentHandler(user_request models.UserRequest) ([]models.Question, error) {
 	analyser_context = append(analyser_context, user_message)
 
 	//ANALYSER CALL
-	result, err := LLMcall(analyser_context)
+	result, err := LLMcall(analyser_context, "gemma2-9b-it")
 	if err != nil {
 		return []models.Question{}, err
 	}
-	response_message, err := convertLLMResult(result)
+	response_message, err := ConvertLLMResult(result)
 	if err != nil {
 		return []models.Question{}, err
 	}
@@ -54,11 +53,11 @@ func AgentHandler(user_request models.UserRequest) ([]models.Question, error) {
 		}
 		generator_context = append(generator_context, analyser_message)
 
-		gen_result, err := LLMcall(generator_context)
+		gen_result, err := LLMcall(generator_context, "llama3-8b-8192")
 		if err != nil {
 			return []models.Question{}, err
 		}
-		gen_response_message, err := convertLLMResult(gen_result)
+		gen_response_message, err := ConvertLLMResult(gen_result)
 		if err != nil {
 			return []models.Question{}, err
 		}
@@ -67,13 +66,8 @@ func AgentHandler(user_request models.UserRequest) ([]models.Question, error) {
 		extracted_content := ExtractJSONBlock(gen_response_message.Content)
 
 		//VALIDATOR CALL
-		validation_result, questions = tools.Validator_tool(extracted_content)
-
-		if !validation_result.IsValid {
-			fmt.Println("NOT VALID GENERATION.")
-			//fmt.Println(response_message.Content)
-			fmt.Println(validation_result.Remark)
-		}
+		validation_result, questions = Validator_tool(extracted_content)
+		fmt.Println(validation_result.Remark)
 	}
 
 	//fmt.Println(response_message.Content)

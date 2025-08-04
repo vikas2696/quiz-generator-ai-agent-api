@@ -1,4 +1,4 @@
-package tools
+package agent
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 )
 
 func validate_format(ques_string string) (models.Validation_result, []models.Question) {
-
+	fmt.Println("**********VALIDATING FORMAT**********")
 	var validation_result models.Validation_result
 	validation_result.IsValid = true
 	validation_result.Remark = "Format validation passed."
@@ -26,6 +26,7 @@ func validate_format(ques_string string) (models.Validation_result, []models.Que
 }
 
 func validate_content(questions []models.Question) models.Validation_result {
+	fmt.Println("**********VALIDATING CONTENT**********")
 	var validation_result models.Validation_result
 	validation_result.IsValid = true
 	validation_result.Remark = "Content validation passed."
@@ -48,25 +49,34 @@ func validate_content(questions []models.Question) models.Validation_result {
 	return validation_result
 }
 
-func validate_quality(_ []models.Question) models.Validation_result {
+func validate_quality(questions []models.Question) models.Validation_result {
+	fmt.Println("**********VALIDATING QUALITY**********")
 	var validation_result models.Validation_result
 	validation_result.IsValid = true
 	validation_result.Remark = "Quality validation passed."
 
-	//fake quality validaton for now
-	// user_message.Role = "system"
-	// user_message.Content = QualityValidatorPrompt(questions)
-	// res, _ := LLMcall([]models.Message{user_message})
-	// respo, _ := convertLLMResult(res)
-	// fmt.Println("************************************")
-	// fmt.Println(respo.Content)
-	// fmt.Println("************************************")
+	var generator_message models.Message
+	generator_message.Role = "system"
+	generator_message.Content = QualityValidatorPrompt(questions)
 
+	result, err := LLMcall([]models.Message{generator_message}, "gemma2-9b-it")
+	if err != nil {
+		validation_result.Remark = "llm error in quality validation: " + err.Error()
+		return validation_result
+	}
+	validator_response, err := ConvertLLMResult(result)
+	if err != nil {
+		validation_result.Remark = "decoding llm error in quality validation: " + err.Error()
+		return validation_result
+	}
+
+	decoded_validator_response := ExtractJSONBlock(validator_response.Content)
+	validation_result.Remark = decoded_validator_response
+	fmt.Println("Quality ------------- " + decoded_validator_response)
 	return validation_result
 }
 
 func Validator_tool(ques_string string) (models.Validation_result, []models.Question) {
-	fmt.Println("**********VALIDATING**********")
 	var validation_result models.Validation_result
 
 	validation_result, questions := validate_format(ques_string)
@@ -75,7 +85,7 @@ func Validator_tool(ques_string string) (models.Validation_result, []models.Ques
 		if validation_result.IsValid {
 			validation_result = validate_quality(questions)
 			if validation_result.IsValid {
-				validation_result.Remark = "All Validations passed."
+				return validation_result, questions
 			}
 		}
 	}

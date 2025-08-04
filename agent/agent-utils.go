@@ -23,13 +23,13 @@ func ExtractJSONBlock(input string) string {
 	return input[start : end+1]
 }
 
-func LLMcall(messages []models.Message) (map[string]any, error) {
+func LLMcall(messages []models.Message, model string) (map[string]any, error) {
 
 	llm_endpoint_url := "https://api.groq.com/openai/v1/chat/completions"
 	var result map[string]any
 
 	llm_request_body := models.LLMRequestBody{
-		Model:    "llama3-8b-8192",
+		Model:    model,
 		Messages: messages,
 		Stream:   false,
 	}
@@ -67,7 +67,7 @@ func LLMcall(messages []models.Message) (map[string]any, error) {
 	return result, err
 }
 
-func convertLLMResult(result map[string]any) (models.Message, error) {
+func ConvertLLMResult(result map[string]any) (models.Message, error) {
 	var received_message models.Message
 
 	if response, ok := result["choices"].([]any); ok && len(response) > 0 {
@@ -79,7 +79,7 @@ func convertLLMResult(result map[string]any) (models.Message, error) {
 	} else {
 		fmt.Println("ERROR.............................")
 		error := result["error"].(map[string]any)
-		//fmt.Println(error["code"])
+		fmt.Println(error)
 		received_message.Role = "assistant"
 		received_message.Content = "Some error occured"
 		return received_message, errors.New(error["code"].(string))

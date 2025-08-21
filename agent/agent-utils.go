@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"quiz-generator-ai-agent-api/models"
@@ -25,8 +24,15 @@ func ExtractJSONBlock(input string) string {
 
 func LLMcall(messages []models.Message, model string) (map[string]any, error) {
 
-	llm_endpoint_url := "https://api.groq.com/openai/v1/chat/completions"
 	var result map[string]any
+
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println(".env not found!")
+		return result, err
+	}
+	api_key := os.Getenv("LLM_API_KEY")
+	llm_endpoint_url := os.Getenv("LLM_API_URL")
 
 	llm_request_body := models.LLMRequestBody{
 		Model:    model,
@@ -47,11 +53,6 @@ func LLMcall(messages []models.Message, model string) (map[string]any, error) {
 		fmt.Println("Error marshaling:", err)
 		return result, err
 	}
-
-	if err := godotenv.Load(); err != nil {
-		log.Println(".env not found!")
-	}
-	api_key := os.Getenv("LLM_API_KEY")
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+api_key)

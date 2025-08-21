@@ -13,6 +13,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println(".env not found!")
+	}
+}
+
 func ExtractJSONBlock(input string) string {
 	start := strings.Index(input, "[")
 	end := strings.LastIndex(input, "]")
@@ -25,12 +32,6 @@ func ExtractJSONBlock(input string) string {
 func LLMcall(messages []models.Message, model string) (map[string]any, error) {
 
 	var result map[string]any
-
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println(".env not found!")
-		return result, err
-	}
 	api_key := os.Getenv("LLM_API_KEY")
 	llm_endpoint_url := os.Getenv("LLM_API_URL")
 
